@@ -1,0 +1,72 @@
+---
+interface Props {
+  originalDate: Date;
+  note?: string;
+}
+
+const { originalDate, note } = Astro.props;
+
+const formattedDate = originalDate.toLocaleDateString('en-US', {
+  year: 'numeric',
+  month: 'long',
+});
+
+const defaultNote = "I wrote this before AI existed. The punchline remains unchanged.";
+---
+
+<aside class="archive-note">
+  <div class="archive-note__icon">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" width="20" height="20">
+      <path d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
+  </div>
+  <div class="archive-note__content">
+    <p class="archive-note__label">From another time</p>
+    <p class="archive-note__date">Written: {formattedDate}</p>
+    <p class="archive-note__text">"{note || defaultNote}"</p>
+  </div>
+</aside>
+
+<style>
+  .archive-note {
+    display: flex;
+    gap: var(--space-md);
+    padding: var(--space-lg);
+    background: var(--bg-secondary);
+    border-left: 3px solid var(--accent);
+    border-radius: 0 6px 6px 0;
+    margin-bottom: var(--space-2xl);
+  }
+
+  .archive-note__icon {
+    color: var(--accent);
+    flex-shrink: 0;
+    margin-top: 2px;
+  }
+
+  .archive-note__content {
+    min-width: 0;
+  }
+
+  .archive-note__label {
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--accent);
+    margin-bottom: var(--space-xs);
+  }
+
+  .archive-note__date {
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+    margin-bottom: var(--space-sm);
+  }
+
+  .archive-note__text {
+    font-family: var(--font-serif);
+    font-style: italic;
+    font-size: 0.95rem;
+    color: var(--text-secondary);
+    line-height: 1.5;
+  }
+</style>

@@ -1,0 +1,146 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import ContentCard from '../components/ContentCard.astro';
+import { getCollection } from 'astro:content';
+
+// Get all notes and tools
+const allNotes = await getCollection('notes');
+const allTools = await getCollection('tools');
+
+// Sort by published date, newest first
+const sortedNotes = allNotes.sort((a, b) =>
+  b.data.publishedDate.valueOf() - a.data.publishedDate.valueOf()
+);
+
+const sortedTools = allTools.sort((a, b) =>
+  b.data.publishedDate.valueOf() - a.data.publishedDate.valueOf()
+);
+
+// Get featured items, or fall back to recent
+const featuredNotes = sortedNotes.filter(n => n.data.featured).slice(0, 6);
+const featuredTools = sortedTools.filter(t => t.data.featured).slice(0, 2);
+
+// If not enough featured, fill with recent
+const displayNotes = featuredNotes.length >= 4
+  ? featuredNotes
+  : sortedNotes.slice(0, 6);
+
+const displayTools = featuredTools.length >= 1
+  ? featuredTools
+  : sortedTools.slice(0, 2);
+
+// Combine and interleave (notes first, then tools at end)
+const allContent = [
+  ...displayNotes.map(n => ({ ...n, type: 'note' as const })),
+  ...displayTools.map(t => ({ ...t, type: 'tool' as const })),
+];
+---
+
+<BaseLayout title="Home">
+  <section class="hero">
+    <div class="container">
+      <h1 class="hero__title">Brown Phantom</h1>
+      <p class="hero__tagline">
+        Notes from a man who read too much, achieved too little,<br />
+        and now has AI to help explain it.
+      </p>
+    </div>
+  </section>
+
+  <section class="content-grid">
+    <div class="container">
+      <div class="grid">
+        {allContent.map(item => (
+          <ContentCard
+            title={item.data.title}
+            intro={item.data.intro}
+            href={item.type === 'note' ? `/notes/${item.slug}` : `/small-machines/${item.slug}`}
+            cardImage={item.data.cardImage}
+            youtubeId={item.type === 'note' ? item.data.youtubeId : undefined}
+            date={item.data.publishedDate}
+            isArchive={item.type === 'note' && !!item.data.originalDate}
+            isTool={item.type === 'tool'}
+          />
+        ))}
+      </div>
+
+      {allContent.length === 0 && (
+        <p class="empty-state">No posts found. Even I'm surprised.</p>
+      )}
+
+      <div class="more-link">
+        <a href="/notes">View all notes &rarr;</a>
+      </div>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .hero {
+    padding: var(--space-3xl) 0;
+    text-align: center;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .hero__title {
+    font-size: 3rem;
+    margin-bottom: var(--space-md);
+    color: var(--text-primary);
+  }
+
+  .hero__tagline {
+    font-family: var(--font-serif);
+    font-size: 1.1rem;
+    color: var(--text-secondary);
+    line-height: 1.6;
+  }
+
+  .content-grid {
+    padding: var(--space-2xl) 0;
+  }
+
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: var(--space-xl);
+  }
+
+  .empty-state {
+    text-align: center;
+    color: var(--text-muted);
+    font-style: italic;
+    padding: var(--space-3xl) 0;
+  }
+
+  .more-link {
+    text-align: center;
+    margin-top: var(--space-2xl);
+  }
+
+  .more-link a {
+    color: var(--accent);
+    font-size: 0.95rem;
+  }
+
+  .more-link a:hover {
+    text-decoration: underline;
+  }
+
+  @media (max-width: 600px) {
+    .hero__title {
+      font-size: 2rem;
+    }
+
+    .hero__tagline {
+      font-size: 1rem;
+    }
+
+    .hero__tagline br {
+      display: none;
+    }
+
+    .grid {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

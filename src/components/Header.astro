@@ -1,0 +1,95 @@
+---
+const navItems = [
+  { label: 'Notes', href: '/notes' },
+  { label: 'Small Machines', href: '/small-machines' },
+  { label: 'Why This Exists', href: '/why-this-exists' },
+];
+
+const currentPath = Astro.url.pathname;
+---
+
+<header class="header">
+  <div class="header__inner container">
+    <a href="/" class="header__logo">
+      <span class="header__logo-text">Brown Phantom</span>
+    </a>
+
+    <nav class="header__nav">
+      {navItems.map(item => (
+        <a
+          href={item.href}
+          class:list={['header__nav-link', { 'is-active': currentPath.startsWith(item.href) }]}
+        >
+          {item.label}
+        </a>
+      ))}
+    </nav>
+  </div>
+</header>
+
+<style>
+  .header {
+    padding: var(--space-lg) 0;
+    border-bottom: 1px solid var(--border);
+    position: sticky;
+    top: 0;
+    background: var(--bg-primary);
+    z-index: 100;
+  }
+
+  .header__inner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-xl);
+  }
+
+  .header__logo {
+    text-decoration: none;
+  }
+
+  .header__logo-text {
+    font-family: var(--font-serif);
+    font-size: 1.4rem;
+    color: var(--text-primary);
+    transition: color 0.2s;
+  }
+
+  .header__logo:hover .header__logo-text {
+    color: var(--accent);
+  }
+
+  .header__nav {
+    display: flex;
+    gap: var(--space-lg);
+  }
+
+  .header__nav-link {
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+    text-decoration: none;
+    padding: var(--space-xs) 0;
+    border-bottom: 2px solid transparent;
+    transition: color 0.2s, border-color 0.2s;
+  }
+
+  .header__nav-link:hover,
+  .header__nav-link.is-active {
+    color: var(--text-primary);
+  }
+
+  .header__nav-link.is-active {
+    border-bottom-color: var(--accent);
+  }
+
+  @media (max-width: 600px) {
+    .header__inner {
+      flex-direction: column;
+      gap: var(--space-md);
+    }
+
+    .header__nav {
+      gap: var(--space-md);
+    }
+  }
+</style>

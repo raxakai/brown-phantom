@@ -1,0 +1,120 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+---
+
+<BaseLayout title="Why This Exists" description="The story behind Brown Phantom - 15 years of silence, now broken.">
+  <article class="about-page">
+    <div class="container container--narrow">
+      <h1 class="about-page__title">Why This Exists</h1>
+
+      <div class="prose">
+        <p>
+          Between 2006 and 2010, I wrote. Not professionally, not prolifically, but persistently.
+          Stories about friends, observations about life, experiments with fiction. About 80 posts
+          in total. Then I stopped.
+        </p>
+
+        <p>
+          The usual reasons applied. Work got busy. Life happened. The blog sat there,
+          gathering digital dust, while I gathered the other kind.
+        </p>
+
+        <p>
+          Fifteen years later, AI happened.
+        </p>
+
+        <p>
+          Suddenly, I could make songs. Generate images. Build tools without the usual friction.
+          The creative impulse that had been dormant stirred again. But this time, with
+          collaborators that never sleep, never judge, and occasionally produce something
+          brilliant for entirely the wrong reasons.
+        </p>
+
+        <hr />
+
+        <h2>What You'll Find Here</h2>
+
+        <p>
+          <strong>Notes</strong> — Stories, observations, experiments. Some excavated from 2008,
+          some written last week. The old posts come with a small note acknowledging their age.
+          I've resisted the urge to over-edit them. The cringe is part of the archive.
+        </p>
+
+        <p>
+          <strong>Small Machines</strong> — Tools I've built. Finance calculators, random utilities,
+          experiments that solved a problem I had. Some might be useful to you. Some exist only
+          because I wanted to see if they could.
+        </p>
+
+        <p>
+          <strong>Embedded Things</strong> — Songs live on YouTube. Images on Instagram.
+          When relevant, they'll appear in the notes. I'm not trying to build a media empire.
+          I'm trying to document what happens when you let AI help explain your failures.
+        </p>
+
+        <hr />
+
+        <h2>The Thesis</h2>
+
+        <p>
+          Everything I've ever written circles the same theme:
+        </p>
+
+        <blockquote>
+          The gap between how clever we think we are and how life actually behaves.
+        </blockquote>
+
+        <p>
+          AI doesn't change this. AI simply becomes another character that overpromises
+          and underdelivers. Like the rest of us.
+        </p>
+
+        <hr />
+
+        <h2>The Voice</h2>
+
+        <p>
+          I am not an AI evangelist. I am not an AI skeptic. I am not an AI explainer.
+        </p>
+
+        <p>
+          I am a slightly annoyed collaborator who suspects the machine is trying too hard.
+        </p>
+
+        <p>
+          If you've read this far, you might enjoy what's here. If not, that's fine too.
+          I document the predictable failure of intelligence with unreasonable specificity.
+          Whether you find that useful is your problem.
+        </p>
+
+        <p class="about-page__sign-off">
+          — The Phantom, 2026
+        </p>
+      </div>
+    </div>
+  </article>
+</BaseLayout>
+
+<style>
+  .about-page {
+    padding: var(--space-2xl) 0 var(--space-3xl);
+  }
+
+  .about-page__title {
+    font-size: 2.4rem;
+    text-align: center;
+    margin-bottom: var(--space-2xl);
+  }
+
+  .about-page__sign-off {
+    margin-top: var(--space-2xl);
+    color: var(--text-muted);
+    font-style: italic;
+  }
+
+  @media (max-width: 600px) {
+    .about-page__title {
+      font-size: 1.8rem;
+    }
+  }
+</style>

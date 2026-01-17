@@ -1,0 +1,69 @@
+---
+const currentYear = new Date().getFullYear();
+---
+
+<footer class="footer">
+  <div class="footer__inner container">
+    <p class="footer__manifesto">
+      I document the predictable failure of intelligence<br />
+      with unreasonable specificity.
+    </p>
+
+    <div class="footer__links">
+      <a href="https://youtube.com/@brownphantom" target="_blank" rel="noopener">YouTube</a>
+      <span class="footer__divider">/</span>
+      <a href="https://instagram.com/brownphantom" target="_blank" rel="noopener">Instagram</a>
+      <span class="footer__divider">/</span>
+      <a href="https://twitter.com/brownphantom" target="_blank" rel="noopener">Twitter</a>
+    </div>
+
+    <p class="footer__copy">
+      &copy; {currentYear} Brown Phantom. No rights reserved, honestly.
+    </p>
+  </div>
+</footer>
+
+<style>
+  .footer {
+    margin-top: var(--space-3xl);
+    padding: var(--space-2xl) 0;
+    border-top: 1px solid var(--border);
+  }
+
+  .footer__inner {
+    text-align: center;
+  }
+
+  .footer__manifesto {
+    font-family: var(--font-serif);
+    font-style: italic;
+    color: var(--text-secondary);
+    font-size: 0.95rem;
+    line-height: 1.6;
+    margin-bottom: var(--space-xl);
+  }
+
+  .footer__links {
+    margin-bottom: var(--space-lg);
+  }
+
+  .footer__links a {
+    color: var(--text-muted);
+    font-size: 0.85rem;
+    transition: color 0.2s;
+  }
+
+  .footer__links a:hover {
+    color: var(--accent);
+  }
+
+  .footer__divider {
+    color: var(--border);
+    margin: 0 var(--space-sm);
+  }
+
+  .footer__copy {
+    color: var(--text-muted);
+    font-size: 0.8rem;
+  }
+</style>

@@ -1,0 +1,133 @@
+---
+import BaseLayout from './BaseLayout.astro';
+import ArchiveNote from '../components/ArchiveNote.astro';
+
+interface Props {
+  title: string;
+  intro: string;
+  publishedDate: Date;
+  originalDate?: Date;
+  archiveNote?: string;
+  tags?: string[];
+  series?: string;
+}
+
+const { title, intro, publishedDate, originalDate, archiveNote, tags = [], series } = Astro.props;
+
+const isArchive = !!originalDate;
+
+const formattedPublishDate = publishedDate.toLocaleDateString('en-US', {
+  year: 'numeric',
+  month: 'long',
+  day: 'numeric',
+});
+---
+
+<BaseLayout title={title} description={intro}>
+  <article class="note">
+    <header class="note__header container container--narrow">
+      <div class="note__meta">
+        <time datetime={publishedDate.toISOString()}>{formattedPublishDate}</time>
+        {series && (
+          <>
+            <span class="note__divider">/</span>
+            <span class="note__series">{series}</span>
+          </>
+        )}
+      </div>
+
+      <h1 class="note__title">{title}</h1>
+
+      {tags.length > 0 && (
+        <div class="note__tags">
+          {tags.map(tag => (
+            <span class="note__tag">#{tag}</span>
+          ))}
+        </div>
+      )}
+    </header>
+
+    <div class="note__content container container--narrow">
+      {isArchive && (
+        <ArchiveNote originalDate={originalDate!} note={archiveNote} />
+      )}
+
+      <div class="prose">
+        <slot />
+      </div>
+    </div>
+
+    <footer class="note__footer container container--narrow">
+      <a href="/notes" class="note__back">&larr; Back to all notes</a>
+    </footer>
+  </article>
+</BaseLayout>
+
+<style>
+  .note {
+    padding: var(--space-2xl) 0;
+  }
+
+  .note__header {
+    margin-bottom: var(--space-2xl);
+    text-align: center;
+  }
+
+  .note__meta {
+    font-size: 0.9rem;
+    color: var(--text-muted);
+    margin-bottom: var(--space-md);
+  }
+
+  .note__divider {
+    margin: 0 var(--space-sm);
+    color: var(--border);
+  }
+
+  .note__series {
+    color: var(--accent);
+  }
+
+  .note__title {
+    font-size: 2.4rem;
+    line-height: 1.2;
+    margin-bottom: var(--space-md);
+  }
+
+  .note__tags {
+    display: flex;
+    gap: var(--space-sm);
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+
+  .note__tag {
+    font-size: 0.8rem;
+    color: var(--text-muted);
+  }
+
+  .note__content {
+    margin-bottom: var(--space-3xl);
+  }
+
+  .note__footer {
+    padding-top: var(--space-xl);
+    border-top: 1px solid var(--border);
+  }
+
+  .note__back {
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+    transition: color 0.2s;
+  }
+
+  .note__back:hover {
+    color: var(--accent);
+  }
+
+  @media (max-width: 600px) {
+    .note__title {
+      font-size: 1.8rem;
+    }
+  }
+</style>

@@ -1,0 +1,109 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+
+export async function getStaticPaths() {
+  const tools = await getCollection('tools');
+  return tools.map(tool => ({
+    params: { slug: tool.slug },
+    props: { tool },
+  }));
+}
+
+const { tool } = Astro.props;
+const { Content } = await tool.render();
+
+const formattedDate = tool.data.publishedDate.toLocaleDateString('en-US', {
+  year: 'numeric',
+  month: 'long',
+  day: 'numeric',
+});
+---
+
+<BaseLayout title={tool.data.title} description={tool.data.intro}>
+  <article class="tool-page">
+    <header class="tool-page__header container container--narrow">
+      <div class="tool-page__meta">
+        <span class="tool-page__badge">Tool</span>
+        <time datetime={tool.data.publishedDate.toISOString()}>{formattedDate}</time>
+      </div>
+
+      <h1 class="tool-page__title">{tool.data.title}</h1>
+      <p class="tool-page__intro">{tool.data.intro}</p>
+    </header>
+
+    <div class="tool-page__content container container--narrow">
+      <div class="prose">
+        <Content />
+      </div>
+    </div>
+
+    <footer class="tool-page__footer container container--narrow">
+      <a href="/small-machines" class="tool-page__back">&larr; Back to all machines</a>
+    </footer>
+  </article>
+</BaseLayout>
+
+<style>
+  .tool-page {
+    padding: var(--space-2xl) 0;
+  }
+
+  .tool-page__header {
+    margin-bottom: var(--space-2xl);
+    text-align: center;
+  }
+
+  .tool-page__meta {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-md);
+    margin-bottom: var(--space-md);
+  }
+
+  .tool-page__badge {
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    padding: 4px 10px;
+    background: var(--accent);
+    color: var(--bg-primary);
+    border-radius: 3px;
+  }
+
+  .tool-page__meta time {
+    font-size: 0.9rem;
+    color: var(--text-muted);
+  }
+
+  .tool-page__title {
+    font-size: 2.4rem;
+    margin-bottom: var(--space-md);
+  }
+
+  .tool-page__intro {
+    font-size: 1.1rem;
+    color: var(--text-secondary);
+    line-height: 1.6;
+  }
+
+  .tool-page__content {
+    margin-bottom: var(--space-3xl);
+  }
+
+  .tool-page__footer {
+    padding-top: var(--space-xl);
+    border-top: 1px solid var(--border);
+  }
+
+  .tool-page__back {
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+    transition: color 0.2s;
+  }
+
+  .tool-page__back:hover {
+    color: var(--accent);
+  }
+</style>

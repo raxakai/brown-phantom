@@ -1,0 +1,510 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+---
+
+<BaseLayout
+  title="The Regret Calculator"
+  description="See what your past purchases would be worth today if invested instead. Sleep well."
+>
+  <article class="tool-page">
+    <div class="container container--narrow">
+      <header class="tool-header">
+        <span class="tool-badge">Tool</span>
+        <h1>The Regret Calculator</h1>
+        <p class="tool-intro">
+          Enter a purchase from the past. See what it would be worth today if you had invested it instead.
+          <br />This tool exists to ruin your day, gently.
+        </p>
+      </header>
+
+      <div class="calculator">
+        <form id="regret-form" class="calculator__form">
+          <div class="form-group">
+            <label for="item">What did you buy?</label>
+            <input
+              type="text"
+              id="item"
+              placeholder="e.g., That leather jacket I never wore"
+              autocomplete="off"
+            />
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="amount">How much? (₹)</label>
+              <input
+                type="number"
+                id="amount"
+                placeholder="50000"
+                min="1"
+                required
+              />
+            </div>
+
+            <div class="form-group">
+              <label for="date">When?</label>
+              <input
+                type="month"
+                id="date"
+                required
+              />
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="return-rate">Assumed annual return</label>
+            <div class="radio-group">
+              <label class="radio-label">
+                <input type="radio" name="return-rate" value="10" />
+                <span>10% <small>(Conservative)</small></span>
+              </label>
+              <label class="radio-label">
+                <input type="radio" name="return-rate" value="12" checked />
+                <span>12% <small>(Nifty average)</small></span>
+              </label>
+              <label class="radio-label">
+                <input type="radio" name="return-rate" value="15" />
+                <span>15% <small>(Optimistic)</small></span>
+              </label>
+            </div>
+          </div>
+
+          <button type="submit" class="calculate-btn">
+            Calculate My Regret
+          </button>
+        </form>
+
+        <div id="result" class="result hidden">
+          <div class="result__amount">
+            <span class="result__label">That would be worth</span>
+            <span class="result__value" id="result-value">₹0</span>
+            <span class="result__label">today</span>
+          </div>
+
+          <div class="result__breakdown">
+            <div class="result__stat">
+              <span class="result__stat-value" id="multiplier">0x</span>
+              <span class="result__stat-label">multiplier</span>
+            </div>
+            <div class="result__stat">
+              <span class="result__stat-value" id="years">0</span>
+              <span class="result__stat-label">years</span>
+            </div>
+            <div class="result__stat">
+              <span class="result__stat-value" id="lost">₹0</span>
+              <span class="result__stat-label">opportunity cost</span>
+            </div>
+          </div>
+
+          <p class="result__commentary" id="commentary"></p>
+
+          <button type="button" class="reset-btn" id="reset-btn">
+            Calculate Another Regret
+          </button>
+        </div>
+      </div>
+
+      <footer class="tool-footer">
+        <p>
+          <strong>Disclaimer:</strong> Past returns don't guarantee future results.
+          But past purchases definitely guarantee present regret.
+        </p>
+        <p>
+          Calculations assume annual compounding. Real investments have volatility,
+          taxes, and the ability to crash right when you need them.
+        </p>
+      </footer>
+    </div>
+  </article>
+</BaseLayout>
+
+<style>
+  .tool-page {
+    padding: var(--space-2xl) 0 var(--space-3xl);
+  }
+
+  .tool-header {
+    text-align: center;
+    margin-bottom: var(--space-2xl);
+  }
+
+  .tool-badge {
+    display: inline-block;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    padding: 4px 12px;
+    background: var(--accent);
+    color: var(--bg-primary);
+    border-radius: 3px;
+    margin-bottom: var(--space-md);
+  }
+
+  .tool-header h1 {
+    font-size: 2.4rem;
+    margin-bottom: var(--space-md);
+  }
+
+  .tool-intro {
+    color: var(--text-secondary);
+    font-size: 1.05rem;
+    line-height: 1.6;
+  }
+
+  .calculator {
+    background: var(--bg-secondary);
+    border-radius: 12px;
+    padding: var(--space-xl);
+    margin-bottom: var(--space-2xl);
+  }
+
+  .calculator__form {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-lg);
+  }
+
+  .form-group {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-sm);
+  }
+
+  .form-group label {
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+  }
+
+  .form-group input[type="text"],
+  .form-group input[type="number"],
+  .form-group input[type="month"] {
+    padding: var(--space-md);
+    font-size: 1rem;
+    background: var(--bg-primary);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    color: var(--text-primary);
+    transition: border-color 0.2s;
+  }
+
+  .form-group input:focus {
+    outline: none;
+    border-color: var(--accent);
+  }
+
+  .form-group input::placeholder {
+    color: var(--text-muted);
+  }
+
+  .form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--space-lg);
+  }
+
+  .radio-group {
+    display: flex;
+    gap: var(--space-md);
+    flex-wrap: wrap;
+  }
+
+  .radio-label {
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+    padding: var(--space-sm) var(--space-md);
+    background: var(--bg-primary);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    cursor: pointer;
+    transition: border-color 0.2s, background 0.2s;
+  }
+
+  .radio-label:has(input:checked) {
+    border-color: var(--accent);
+    background: rgba(201, 162, 39, 0.1);
+  }
+
+  .radio-label input {
+    accent-color: var(--accent);
+  }
+
+  .radio-label small {
+    color: var(--text-muted);
+    font-size: 0.8rem;
+  }
+
+  .calculate-btn {
+    padding: var(--space-md) var(--space-xl);
+    font-size: 1rem;
+    font-weight: 500;
+    background: var(--accent);
+    color: var(--bg-primary);
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background 0.2s, transform 0.1s;
+  }
+
+  .calculate-btn:hover {
+    background: var(--accent-hover);
+  }
+
+  .calculate-btn:active {
+    transform: scale(0.98);
+  }
+
+  /* Result */
+  .result {
+    text-align: center;
+    padding: var(--space-xl) 0;
+  }
+
+  .result.hidden {
+    display: none;
+  }
+
+  .result__amount {
+    margin-bottom: var(--space-xl);
+  }
+
+  .result__label {
+    display: block;
+    font-size: 0.9rem;
+    color: var(--text-muted);
+    margin-bottom: var(--space-xs);
+  }
+
+  .result__value {
+    display: block;
+    font-family: var(--font-serif);
+    font-size: 3.5rem;
+    color: var(--accent);
+    line-height: 1.2;
+    margin: var(--space-sm) 0;
+  }
+
+  .result__breakdown {
+    display: flex;
+    justify-content: center;
+    gap: var(--space-2xl);
+    margin-bottom: var(--space-xl);
+    padding: var(--space-lg) 0;
+    border-top: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+  }
+
+  .result__stat {
+    text-align: center;
+  }
+
+  .result__stat-value {
+    display: block;
+    font-size: 1.4rem;
+    font-weight: 500;
+    color: var(--text-primary);
+  }
+
+  .result__stat-label {
+    font-size: 0.8rem;
+    color: var(--text-muted);
+  }
+
+  .result__commentary {
+    font-family: var(--font-serif);
+    font-style: italic;
+    font-size: 1.1rem;
+    color: var(--text-secondary);
+    line-height: 1.6;
+    max-width: 500px;
+    margin: 0 auto var(--space-xl);
+  }
+
+  .reset-btn {
+    padding: var(--space-sm) var(--space-lg);
+    font-size: 0.9rem;
+    background: transparent;
+    color: var(--text-secondary);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    cursor: pointer;
+    transition: border-color 0.2s, color 0.2s;
+  }
+
+  .reset-btn:hover {
+    border-color: var(--text-secondary);
+    color: var(--text-primary);
+  }
+
+  /* Footer */
+  .tool-footer {
+    text-align: center;
+    padding-top: var(--space-xl);
+    border-top: 1px solid var(--border);
+  }
+
+  .tool-footer p {
+    font-size: 0.85rem;
+    color: var(--text-muted);
+    margin-bottom: var(--space-sm);
+  }
+
+  @media (max-width: 600px) {
+    .tool-header h1 {
+      font-size: 1.8rem;
+    }
+
+    .form-row {
+      grid-template-columns: 1fr;
+    }
+
+    .radio-group {
+      flex-direction: column;
+    }
+
+    .result__value {
+      font-size: 2.5rem;
+    }
+
+    .result__breakdown {
+      flex-direction: column;
+      gap: var(--space-md);
+    }
+  }
+</style>
+
+<script>
+  const form = document.getElementById('regret-form') as HTMLFormElement;
+  const resultDiv = document.getElementById('result') as HTMLDivElement;
+  const resetBtn = document.getElementById('reset-btn') as HTMLButtonElement;
+
+  // Set max date to current month
+  const dateInput = document.getElementById('date') as HTMLInputElement;
+  const now = new Date();
+  const maxDate = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
+  dateInput.max = maxDate;
+
+  // Set default to 5 years ago
+  const defaultDate = new Date(now.getFullYear() - 5, now.getMonth());
+  dateInput.value = `${defaultDate.getFullYear()}-${String(defaultDate.getMonth() + 1).padStart(2, '0')}`;
+
+  const commentaries = {
+    small: [
+      "A minor sting. You'll survive.",
+      "Pocket change in the grand scheme. But still.",
+      "Not catastrophic, but compound interest doesn't care about your feelings.",
+    ],
+    medium: [
+      "This one hurts a little, doesn't it?",
+      "Enough to fund a decent vacation. Gone, like your youth.",
+      "The ghost of purchases past sends its regards.",
+    ],
+    large: [
+      "Ouch. That's a down payment on regret.",
+      "This could have been a car. A used one, but still.",
+      "Your future self would like a word with your past self.",
+    ],
+    massive: [
+      "Congratulations. You've achieved financial enlightenment through suffering.",
+      "This is the kind of number that keeps people awake at night. Sweet dreams.",
+      "Some lessons cost more than others. This was an expensive one.",
+    ],
+    lifechanging: [
+      "This could have changed the trajectory of your life. It didn't. Here we are.",
+      "We've moved beyond regret into philosophical territory. What even is money?",
+      "At this point, the only rational response is laughter. Or tears. Your call.",
+    ]
+  };
+
+  function getCommentary(multiplier: number, lost: number): string {
+    let category: keyof typeof commentaries;
+
+    if (lost < 10000) {
+      category = 'small';
+    } else if (lost < 100000) {
+      category = 'medium';
+    } else if (lost < 500000) {
+      category = 'large';
+    } else if (lost < 2000000) {
+      category = 'massive';
+    } else {
+      category = 'lifechanging';
+    }
+
+    const options = commentaries[category];
+    return options[Math.floor(Math.random() * options.length)];
+  }
+
+  function formatCurrency(amount: number): string {
+    if (amount >= 10000000) {
+      return `₹${(amount / 10000000).toFixed(2)} Cr`;
+    } else if (amount >= 100000) {
+      return `₹${(amount / 100000).toFixed(2)} L`;
+    } else {
+      return `₹${amount.toLocaleString('en-IN', { maximumFractionDigits: 0 })}`;
+    }
+  }
+
+  function calculateRegret(amount: number, dateStr: string, annualReturn: number): {
+    futureValue: number;
+    years: number;
+    multiplier: number;
+    lost: number;
+  } {
+    const purchaseDate = new Date(dateStr + '-01');
+    const today = new Date();
+
+    // Calculate years (including fractional)
+    const diffTime = today.getTime() - purchaseDate.getTime();
+    const years = diffTime / (1000 * 60 * 60 * 24 * 365.25);
+
+    // Compound interest: A = P(1 + r)^t
+    const rate = annualReturn / 100;
+    const futureValue = amount * Math.pow(1 + rate, years);
+
+    const multiplier = futureValue / amount;
+    const lost = futureValue - amount;
+
+    return { futureValue, years, multiplier, lost };
+  }
+
+  form.addEventListener('submit', (e) => {
+    e.preventDefault();
+
+    const amountInput = document.getElementById('amount') as HTMLInputElement;
+    const dateInput = document.getElementById('date') as HTMLInputElement;
+    const itemInput = document.getElementById('item') as HTMLInputElement;
+    const rateInput = document.querySelector('input[name="return-rate"]:checked') as HTMLInputElement;
+
+    const amount = parseFloat(amountInput.value);
+    const dateStr = dateInput.value;
+    const annualReturn = parseFloat(rateInput.value);
+
+    if (!amount || !dateStr) return;
+
+    const result = calculateRegret(amount, dateStr, annualReturn);
+
+    // Update UI
+    (document.getElementById('result-value') as HTMLElement).textContent = formatCurrency(result.futureValue);
+    (document.getElementById('multiplier') as HTMLElement).textContent = result.multiplier.toFixed(1) + 'x';
+    (document.getElementById('years') as HTMLElement).textContent = result.years.toFixed(1);
+    (document.getElementById('lost') as HTMLElement).textContent = formatCurrency(result.lost);
+    (document.getElementById('commentary') as HTMLElement).textContent = `"${getCommentary(result.multiplier, result.lost)}"`;
+
+    // Show result, hide form
+    form.classList.add('hidden');
+    resultDiv.classList.remove('hidden');
+  });
+
+  resetBtn.addEventListener('click', () => {
+    form.classList.remove('hidden');
+    resultDiv.classList.add('hidden');
+    (document.getElementById('item') as HTMLInputElement).value = '';
+    (document.getElementById('amount') as HTMLInputElement).value = '';
+  });
+
+  // Add hidden class style
+  const style = document.createElement('style');
+  style.textContent = '.hidden { display: none !important; }';
+  document.head.appendChild(style);
+</script>

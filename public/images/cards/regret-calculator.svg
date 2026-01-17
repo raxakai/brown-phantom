@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 360">
+  <rect width="640" height="360" fill="#1a1a1a"/>
+
+  <!-- Grid pattern -->
+  <defs>
+    <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
+      <path d="M 40 0 L 0 0 0 40" fill="none" stroke="#2d2d2d" stroke-width="1"/>
+    </pattern>
+  </defs>
+  <rect width="640" height="360" fill="url(#grid)"/>
+
+  <!-- Upward trending line (what could have been) -->
+  <path d="M 80 280 Q 200 260 280 200 T 480 80" fill="none" stroke="#c9a227" stroke-width="3" stroke-dasharray="8 4" opacity="0.6"/>
+
+  <!-- Flat line (what happened) -->
+  <path d="M 80 280 L 560 280" fill="none" stroke="#e8e6e3" stroke-width="2" opacity="0.3"/>
+
+  <!-- Rupee symbol -->
+  <text x="320" y="200" font-family="Georgia, serif" font-size="72" fill="#c9a227" text-anchor="middle" opacity="0.8">₹</text>
+
+  <!-- Question mark -->
+  <text x="380" y="160" font-family="Georgia, serif" font-size="48" fill="#e8e6e3" text-anchor="middle" opacity="0.4">?</text>
+
+  <!-- Arrow pointing up -->
+  <path d="M 500 120 L 520 80 L 540 120 M 520 80 L 520 160" fill="none" stroke="#c9a227" stroke-width="2" opacity="0.5"/>
+</svg>

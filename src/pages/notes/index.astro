@@ -1,0 +1,103 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import ContentCard from '../../components/ContentCard.astro';
+import { getCollection } from 'astro:content';
+
+const allNotes = await getCollection('notes');
+
+// Sort by published date, newest first
+const sortedNotes = allNotes.sort((a, b) =>
+  b.data.publishedDate.valueOf() - a.data.publishedDate.valueOf()
+);
+
+// Group by year for optional timeline display
+const notesByYear = sortedNotes.reduce((acc, note) => {
+  const year = note.data.publishedDate.getFullYear();
+  if (!acc[year]) acc[year] = [];
+  acc[year].push(note);
+  return acc;
+}, {} as Record<number, typeof sortedNotes>);
+
+const years = Object.keys(notesByYear).map(Number).sort((a, b) => b - a);
+---
+
+<BaseLayout title="Notes" description="All notes, stories, and experiments - old and new.">
+  <section class="notes-page">
+    <div class="container">
+      <header class="page-header">
+        <h1 class="page-header__title">Notes</h1>
+        <p class="page-header__description">
+          Stories, observations, experiments. Some from 15 years ago, some from last week.<br />
+          The thesis remains the same.
+        </p>
+      </header>
+
+      {sortedNotes.length === 0 ? (
+        <p class="empty-state">Nothing here yet. The phantom is still writing.</p>
+      ) : (
+        <div class="grid">
+          {sortedNotes.map(note => (
+            <ContentCard
+              title={note.data.title}
+              intro={note.data.intro}
+              href={`/notes/${note.slug}`}
+              cardImage={note.data.cardImage}
+              youtubeId={note.data.youtubeId}
+              date={note.data.publishedDate}
+              isArchive={!!note.data.originalDate}
+            />
+          ))}
+        </div>
+      )}
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .notes-page {
+    padding: var(--space-2xl) 0;
+  }
+
+  .page-header {
+    text-align: center;
+    margin-bottom: var(--space-2xl);
+  }
+
+  .page-header__title {
+    font-size: 2.4rem;
+    margin-bottom: var(--space-md);
+  }
+
+  .page-header__description {
+    color: var(--text-secondary);
+    font-size: 1rem;
+    line-height: 1.6;
+  }
+
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: var(--space-xl);
+  }
+
+  .empty-state {
+    text-align: center;
+    color: var(--text-muted);
+    font-style: italic;
+    padding: var(--space-3xl) 0;
+  }
+
+  @media (max-width: 600px) {
+    .page-header__title {
+      font-size: 1.8rem;
+    }
+
+    .page-header__description br {
+      display: none;
+    }
+
+    .grid {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

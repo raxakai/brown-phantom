@@ -1,0 +1,104 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import ContentCard from '../../components/ContentCard.astro';
+import { getCollection } from 'astro:content';
+
+const allTools = await getCollection('tools');
+
+const sortedTools = allTools.sort((a, b) =>
+  b.data.publishedDate.valueOf() - a.data.publishedDate.valueOf()
+);
+---
+
+<BaseLayout title="Small Machines" description="Tools and utilities. Some useful, some experiments.">
+  <section class="tools-page">
+    <div class="container">
+      <header class="page-header">
+        <h1 class="page-header__title">Small Machines</h1>
+        <p class="page-header__description">
+          Tools I've built. Some solve real problems.<br />
+          Others exist because I was curious if they could.
+        </p>
+      </header>
+
+      {sortedTools.length === 0 ? (
+        <div class="empty-state">
+          <p>No machines running yet.</p>
+          <p class="empty-state__sub">Check back soon. Something is always being built.</p>
+        </div>
+      ) : (
+        <div class="grid">
+          {sortedTools.map(tool => (
+            <ContentCard
+              title={tool.data.title}
+              intro={tool.data.intro}
+              href={tool.data.toolUrl || `/small-machines/${tool.slug}`}
+              cardImage={tool.data.cardImage}
+              date={tool.data.publishedDate}
+              isTool={true}
+            />
+          ))}
+        </div>
+      )}
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .tools-page {
+    padding: var(--space-2xl) 0;
+  }
+
+  .page-header {
+    text-align: center;
+    margin-bottom: var(--space-2xl);
+  }
+
+  .page-header__title {
+    font-size: 2.4rem;
+    margin-bottom: var(--space-md);
+  }
+
+  .page-header__description {
+    color: var(--text-secondary);
+    font-size: 1rem;
+    line-height: 1.6;
+  }
+
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: var(--space-xl);
+    max-width: 900px;
+    margin: 0 auto;
+  }
+
+  .empty-state {
+    text-align: center;
+    padding: var(--space-3xl) 0;
+  }
+
+  .empty-state p {
+    color: var(--text-muted);
+    font-style: italic;
+  }
+
+  .empty-state__sub {
+    font-size: 0.9rem;
+    margin-top: var(--space-sm);
+  }
+
+  @media (max-width: 600px) {
+    .page-header__title {
+      font-size: 1.8rem;
+    }
+
+    .page-header__description br {
+      display: none;
+    }
+
+    .grid {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>
