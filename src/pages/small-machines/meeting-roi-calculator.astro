@@ -1,0 +1,687 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+---
+
+<BaseLayout
+  title="Meeting ROI Calculator"
+  description="Calculate the true cost of that meeting. Spoiler: it's more than you think."
+>
+  <article class="tool-page">
+    <div class="container container--narrow">
+      <header class="tool-header">
+        <span class="tool-badge">Tool</span>
+        <h1>Meeting ROI Calculator</h1>
+        <p class="tool-intro">
+          Enter the attendees and duration. See how much that "quick sync" actually costs.
+          <br />Use responsibly. Or forward to your manager.
+        </p>
+      </header>
+
+      <div class="calculator">
+        <form id="meeting-form" class="calculator__form">
+          <div class="form-group">
+            <label for="meeting-name">What's this meeting about?</label>
+            <input
+              type="text"
+              id="meeting-name"
+              placeholder="e.g., Weekly sync that could've been an email"
+              autocomplete="off"
+            />
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="attendees">Number of attendees</label>
+              <input
+                type="number"
+                id="attendees"
+                placeholder="8"
+                min="2"
+                max="100"
+                required
+              />
+            </div>
+
+            <div class="form-group">
+              <label for="duration">Duration (minutes)</label>
+              <input
+                type="number"
+                id="duration"
+                placeholder="60"
+                min="5"
+                max="480"
+                required
+              />
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="avg-salary">Average monthly salary (₹)</label>
+            <div class="salary-presets">
+              <button type="button" class="preset-btn" data-salary="50000">₹50K</button>
+              <button type="button" class="preset-btn" data-salary="100000">₹1L</button>
+              <button type="button" class="preset-btn active" data-salary="150000">₹1.5L</button>
+              <button type="button" class="preset-btn" data-salary="200000">₹2L</button>
+              <button type="button" class="preset-btn" data-salary="300000">₹3L</button>
+            </div>
+            <input
+              type="number"
+              id="avg-salary"
+              placeholder="150000"
+              min="10000"
+              value="150000"
+              required
+            />
+            <small class="form-hint">Or enter a custom amount above</small>
+          </div>
+
+          <div class="form-group">
+            <label>Meeting frequency</label>
+            <div class="radio-group">
+              <label class="radio-label">
+                <input type="radio" name="frequency" value="once" checked />
+                <span>One-time</span>
+              </label>
+              <label class="radio-label">
+                <input type="radio" name="frequency" value="weekly" />
+                <span>Weekly</span>
+              </label>
+              <label class="radio-label">
+                <input type="radio" name="frequency" value="daily" />
+                <span>Daily</span>
+              </label>
+            </div>
+          </div>
+
+          <button type="submit" class="calculate-btn">
+            Calculate The Damage
+          </button>
+        </form>
+
+        <div id="result" class="result hidden">
+          <div class="result__header">
+            <span class="result__meeting-name" id="result-meeting-name"></span>
+          </div>
+
+          <div class="result__amount">
+            <span class="result__label">This meeting costs</span>
+            <span class="result__value" id="result-value">₹0</span>
+            <span class="result__frequency-note" id="frequency-note"></span>
+          </div>
+
+          <div class="result__breakdown">
+            <div class="result__stat">
+              <span class="result__stat-value" id="per-minute">₹0</span>
+              <span class="result__stat-label">per minute</span>
+            </div>
+            <div class="result__stat">
+              <span class="result__stat-value" id="per-person">₹0</span>
+              <span class="result__stat-label">per person</span>
+            </div>
+            <div class="result__stat" id="yearly-stat">
+              <span class="result__stat-value" id="yearly-cost">₹0</span>
+              <span class="result__stat-label">yearly cost</span>
+            </div>
+          </div>
+
+          <div class="result__equivalents">
+            <p class="result__equiv-label">This meeting could have paid for:</p>
+            <ul class="result__equiv-list" id="equivalents"></ul>
+          </div>
+
+          <p class="result__commentary" id="commentary"></p>
+
+          <button type="button" class="reset-btn" id="reset-btn">
+            Calculate Another Meeting
+          </button>
+        </div>
+      </div>
+
+      <footer class="tool-footer">
+        <p>
+          <strong>Calculation:</strong> (Monthly salary ÷ 22 working days ÷ 8 hours ÷ 60 minutes) × attendees × duration
+        </p>
+        <p>
+          This doesn't include the cost of context switching, post-meeting recovery time,
+          or the existential dread of seeing another calendar invite.
+        </p>
+      </footer>
+    </div>
+  </article>
+</BaseLayout>
+
+<style>
+  .tool-page {
+    padding: var(--space-2xl) 0 var(--space-3xl);
+  }
+
+  .tool-header {
+    text-align: center;
+    margin-bottom: var(--space-2xl);
+  }
+
+  .tool-badge {
+    display: inline-block;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    padding: 4px 12px;
+    background: var(--accent);
+    color: var(--bg-primary);
+    border-radius: 3px;
+    margin-bottom: var(--space-md);
+  }
+
+  .tool-header h1 {
+    font-size: 2.4rem;
+    margin-bottom: var(--space-md);
+  }
+
+  .tool-intro {
+    color: var(--text-secondary);
+    font-size: 1.05rem;
+    line-height: 1.6;
+  }
+
+  .calculator {
+    background: var(--bg-secondary);
+    border-radius: 12px;
+    padding: var(--space-xl);
+    margin-bottom: var(--space-2xl);
+  }
+
+  .calculator__form {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-lg);
+  }
+
+  .form-group {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-sm);
+  }
+
+  .form-group label {
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+  }
+
+  .form-group input[type="text"],
+  .form-group input[type="number"] {
+    padding: var(--space-md);
+    font-size: 1rem;
+    background: var(--bg-primary);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    color: var(--text-primary);
+    transition: border-color 0.2s;
+  }
+
+  .form-group input:focus {
+    outline: none;
+    border-color: var(--accent);
+  }
+
+  .form-group input::placeholder {
+    color: var(--text-muted);
+  }
+
+  .form-hint {
+    font-size: 0.8rem;
+    color: var(--text-muted);
+  }
+
+  .form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--space-lg);
+  }
+
+  .salary-presets {
+    display: flex;
+    gap: var(--space-sm);
+    flex-wrap: wrap;
+    margin-bottom: var(--space-sm);
+  }
+
+  .preset-btn {
+    padding: var(--space-xs) var(--space-md);
+    font-size: 0.85rem;
+    background: var(--bg-primary);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    color: var(--text-secondary);
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .preset-btn:hover {
+    border-color: var(--text-muted);
+  }
+
+  .preset-btn.active {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: var(--bg-primary);
+  }
+
+  .radio-group {
+    display: flex;
+    gap: var(--space-md);
+    flex-wrap: wrap;
+  }
+
+  .radio-label {
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+    padding: var(--space-sm) var(--space-md);
+    background: var(--bg-primary);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    cursor: pointer;
+    transition: border-color 0.2s, background 0.2s;
+  }
+
+  .radio-label:has(input:checked) {
+    border-color: var(--accent);
+    background: rgba(201, 162, 39, 0.1);
+  }
+
+  .radio-label input {
+    accent-color: var(--accent);
+  }
+
+  .calculate-btn {
+    padding: var(--space-md) var(--space-xl);
+    font-size: 1rem;
+    font-weight: 500;
+    background: var(--accent);
+    color: var(--bg-primary);
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background 0.2s, transform 0.1s;
+  }
+
+  .calculate-btn:hover {
+    background: var(--accent-hover);
+  }
+
+  .calculate-btn:active {
+    transform: scale(0.98);
+  }
+
+  /* Result */
+  .result {
+    text-align: center;
+    padding: var(--space-xl) 0;
+  }
+
+  .result.hidden {
+    display: none;
+  }
+
+  .result__header {
+    margin-bottom: var(--space-md);
+  }
+
+  .result__meeting-name {
+    font-size: 0.9rem;
+    color: var(--text-muted);
+    font-style: italic;
+  }
+
+  .result__amount {
+    margin-bottom: var(--space-xl);
+  }
+
+  .result__label {
+    display: block;
+    font-size: 0.9rem;
+    color: var(--text-muted);
+    margin-bottom: var(--space-xs);
+  }
+
+  .result__value {
+    display: block;
+    font-family: var(--font-serif);
+    font-size: 3.5rem;
+    color: var(--accent);
+    line-height: 1.2;
+    margin: var(--space-sm) 0;
+  }
+
+  .result__frequency-note {
+    display: block;
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+  }
+
+  .result__breakdown {
+    display: flex;
+    justify-content: center;
+    gap: var(--space-2xl);
+    margin-bottom: var(--space-xl);
+    padding: var(--space-lg) 0;
+    border-top: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+  }
+
+  .result__stat {
+    text-align: center;
+  }
+
+  .result__stat-value {
+    display: block;
+    font-size: 1.4rem;
+    font-weight: 500;
+    color: var(--text-primary);
+  }
+
+  .result__stat-label {
+    font-size: 0.8rem;
+    color: var(--text-muted);
+  }
+
+  .result__equivalents {
+    margin-bottom: var(--space-xl);
+    text-align: left;
+    background: var(--bg-primary);
+    padding: var(--space-lg);
+    border-radius: 8px;
+  }
+
+  .result__equiv-label {
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+    margin-bottom: var(--space-md);
+  }
+
+  .result__equiv-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-sm);
+  }
+
+  .result__equiv-list li {
+    font-size: 0.95rem;
+    color: var(--text-primary);
+    padding-left: var(--space-lg);
+    position: relative;
+  }
+
+  .result__equiv-list li::before {
+    content: "→";
+    position: absolute;
+    left: 0;
+    color: var(--accent);
+  }
+
+  .result__commentary {
+    font-family: var(--font-serif);
+    font-style: italic;
+    font-size: 1.1rem;
+    color: var(--text-secondary);
+    line-height: 1.6;
+    max-width: 500px;
+    margin: 0 auto var(--space-xl);
+  }
+
+  .reset-btn {
+    padding: var(--space-sm) var(--space-lg);
+    font-size: 0.9rem;
+    background: transparent;
+    color: var(--text-secondary);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    cursor: pointer;
+    transition: border-color 0.2s, color 0.2s;
+  }
+
+  .reset-btn:hover {
+    border-color: var(--text-secondary);
+    color: var(--text-primary);
+  }
+
+  /* Footer */
+  .tool-footer {
+    text-align: center;
+    padding-top: var(--space-xl);
+    border-top: 1px solid var(--border);
+  }
+
+  .tool-footer p {
+    font-size: 0.85rem;
+    color: var(--text-muted);
+    margin-bottom: var(--space-sm);
+  }
+
+  @media (max-width: 600px) {
+    .tool-header h1 {
+      font-size: 1.8rem;
+    }
+
+    .form-row {
+      grid-template-columns: 1fr;
+    }
+
+    .salary-presets {
+      justify-content: center;
+    }
+
+    .radio-group {
+      flex-direction: column;
+    }
+
+    .result__value {
+      font-size: 2.5rem;
+    }
+
+    .result__breakdown {
+      flex-direction: column;
+      gap: var(--space-md);
+    }
+  }
+</style>
+
+<script>
+  const form = document.getElementById('meeting-form') as HTMLFormElement;
+  const resultDiv = document.getElementById('result') as HTMLDivElement;
+  const resetBtn = document.getElementById('reset-btn') as HTMLButtonElement;
+  const salaryInput = document.getElementById('avg-salary') as HTMLInputElement;
+  const presetBtns = document.querySelectorAll('.preset-btn');
+
+  // Preset button handling
+  presetBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+      const salary = (btn as HTMLButtonElement).dataset.salary;
+      salaryInput.value = salary || '150000';
+      presetBtns.forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+    });
+  });
+
+  // Update preset selection when input changes
+  salaryInput.addEventListener('input', () => {
+    const value = salaryInput.value;
+    presetBtns.forEach(btn => {
+      btn.classList.toggle('active', (btn as HTMLButtonElement).dataset.salary === value);
+    });
+  });
+
+  const commentaries = {
+    cheap: [
+      "Barely a dent. But multiply this by how many times it happens...",
+      "A bargain, as meetings go. Suspicious.",
+      "This one's on the house. Almost.",
+    ],
+    moderate: [
+      "A nice team lunch. Gone. Into the void of 'aligning stakeholders'.",
+      "Someone could've been hired for a day instead.",
+      "This is fine. Everything is fine.",
+    ],
+    expensive: [
+      "This meeting costs more than some people's rent.",
+      "A junior developer's weekly salary. For one hour of 'syncing up'.",
+      "At this rate, you're burning through funding faster than a crypto startup.",
+    ],
+    absurd: [
+      "Congratulations. This meeting is more expensive than a small car. Monthly.",
+      "You could hire a full-time meeting-avoider for this amount.",
+      "At this point, just wire the money to a random charity. Better ROI.",
+    ],
+    criminal: [
+      "This should be illegal. I'm not joking.",
+      "The GDP of a small island nation thanks you for your contribution.",
+      "Whoever scheduled this meeting should be in prison. Financially speaking.",
+    ]
+  };
+
+  function getCommentary(cost: number, isRecurring: boolean): string {
+    const effectiveCost = isRecurring ? cost * 52 : cost;
+    let category: keyof typeof commentaries;
+
+    if (effectiveCost < 5000) {
+      category = 'cheap';
+    } else if (effectiveCost < 25000) {
+      category = 'moderate';
+    } else if (effectiveCost < 100000) {
+      category = 'expensive';
+    } else if (effectiveCost < 500000) {
+      category = 'absurd';
+    } else {
+      category = 'criminal';
+    }
+
+    const options = commentaries[category];
+    return options[Math.floor(Math.random() * options.length)];
+  }
+
+  function formatCurrency(amount: number): string {
+    if (amount >= 10000000) {
+      return `₹${(amount / 10000000).toFixed(2)} Cr`;
+    } else if (amount >= 100000) {
+      return `₹${(amount / 100000).toFixed(2)} L`;
+    } else {
+      return `₹${amount.toLocaleString('en-IN', { maximumFractionDigits: 0 })}`;
+    }
+  }
+
+  function getEquivalents(cost: number): string[] {
+    const equivalents: string[] = [];
+
+    if (cost >= 100) {
+      equivalents.push(`${Math.floor(cost / 100)} cups of office coffee`);
+    }
+    if (cost >= 300) {
+      equivalents.push(`${Math.floor(cost / 300)} Zomato orders`);
+    }
+    if (cost >= 500) {
+      equivalents.push(`${Math.floor(cost / 500)} Uber rides`);
+    }
+    if (cost >= 2000) {
+      equivalents.push(`${Math.floor(cost / 2000)} movie tickets (with popcorn)`);
+    }
+    if (cost >= 15000) {
+      equivalents.push(`${Math.floor(cost / 15000)} months of Netflix`);
+    }
+    if (cost >= 50000) {
+      equivalents.push(`${(cost / 50000).toFixed(1)} junior dev days`);
+    }
+    if (cost >= 100000) {
+      equivalents.push(`${(cost / 100000).toFixed(1)} MacBook Airs`);
+    }
+
+    return equivalents.slice(0, 4);
+  }
+
+  function calculateMeetingCost(
+    attendees: number,
+    durationMinutes: number,
+    monthlySalary: number
+  ): { cost: number; perMinute: number; perPerson: number } {
+    // Monthly salary → per minute rate
+    // Assuming 22 working days, 8 hours per day
+    const workingMinutesPerMonth = 22 * 8 * 60;
+    const perMinuteRate = monthlySalary / workingMinutesPerMonth;
+
+    const totalCost = perMinuteRate * attendees * durationMinutes;
+    const perMinute = perMinuteRate * attendees;
+    const perPerson = totalCost / attendees;
+
+    return { cost: totalCost, perMinute, perPerson };
+  }
+
+  form.addEventListener('submit', (e) => {
+    e.preventDefault();
+
+    const meetingName = (document.getElementById('meeting-name') as HTMLInputElement).value || 'Unnamed meeting';
+    const attendees = parseInt((document.getElementById('attendees') as HTMLInputElement).value);
+    const duration = parseInt((document.getElementById('duration') as HTMLInputElement).value);
+    const salary = parseInt(salaryInput.value);
+    const frequency = (document.querySelector('input[name="frequency"]:checked') as HTMLInputElement).value;
+
+    if (!attendees || !duration || !salary) return;
+
+    const result = calculateMeetingCost(attendees, duration, salary);
+
+    // Calculate yearly cost for recurring
+    let yearlyCost = result.cost;
+    let frequencyNote = '';
+    const isRecurring = frequency !== 'once';
+
+    if (frequency === 'weekly') {
+      yearlyCost = result.cost * 52;
+      frequencyNote = 'every week';
+    } else if (frequency === 'daily') {
+      yearlyCost = result.cost * 260; // 5 days * 52 weeks
+      frequencyNote = 'every single day';
+    }
+
+    // Update UI
+    (document.getElementById('result-meeting-name') as HTMLElement).textContent = `"${meetingName}"`;
+    (document.getElementById('result-value') as HTMLElement).textContent = formatCurrency(result.cost);
+    (document.getElementById('frequency-note') as HTMLElement).textContent = frequencyNote;
+    (document.getElementById('per-minute') as HTMLElement).textContent = formatCurrency(result.perMinute);
+    (document.getElementById('per-person') as HTMLElement).textContent = formatCurrency(result.perPerson);
+
+    const yearlyStat = document.getElementById('yearly-stat') as HTMLElement;
+    if (isRecurring) {
+      yearlyStat.style.display = 'block';
+      (document.getElementById('yearly-cost') as HTMLElement).textContent = formatCurrency(yearlyCost);
+    } else {
+      yearlyStat.style.display = 'none';
+    }
+
+    // Equivalents
+    const equivList = document.getElementById('equivalents') as HTMLUListElement;
+    equivList.innerHTML = getEquivalents(result.cost)
+      .map(eq => `<li>${eq}</li>`)
+      .join('');
+
+    // Commentary
+    (document.getElementById('commentary') as HTMLElement).textContent = `"${getCommentary(result.cost, isRecurring)}"`;
+
+    // Show result, hide form
+    form.classList.add('hidden');
+    resultDiv.classList.remove('hidden');
+  });
+
+  resetBtn.addEventListener('click', () => {
+    form.classList.remove('hidden');
+    resultDiv.classList.add('hidden');
+    (document.getElementById('meeting-name') as HTMLInputElement).value = '';
+    (document.getElementById('attendees') as HTMLInputElement).value = '';
+    (document.getElementById('duration') as HTMLInputElement).value = '';
+  });
+
+  // Add hidden class style
+  const style = document.createElement('style');
+  style.textContent = '.hidden { display: none !important; }';
+  document.head.appendChild(style);
+</script>
